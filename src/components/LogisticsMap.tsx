@@ -31,19 +31,19 @@ const LogisticsMap: React.FC<LogisticsMapProps> = ({ selectedDay }) => {
       
       const el = document.createElement('div');
       el.className = 'mapboxgl-marker';
-      el.style.width = '12px';
-      el.style.height = '12px';
+      el.style.width = '14px';
+      el.style.height = '14px';
       el.style.borderRadius = '50%';
       el.style.backgroundColor = color;
       el.style.border = '2px solid white';
-      el.style.boxShadow = '0 0 2px rgba(0,0,0,0.3)';
+      el.style.boxShadow = '0 0 4px rgba(0,0,0,0.5)';
       
       // Create popup
       const popup = new mapboxgl.Popup({ offset: 15 })
         .setHTML(`
-          <div>
-            <strong>${location.name}</strong>
-            <div>Serviced on: ${location.days.join(', ')}</div>
+          <div style="padding: 8px;">
+            <strong style="font-size: 14px;">${location.name}</strong>
+            <div style="font-size: 12px; margin-top: 4px;">Serviced on: ${location.days.join(', ')}</div>
           </div>
         `);
       
@@ -63,8 +63,8 @@ const LogisticsMap: React.FC<LogisticsMapProps> = ({ selectedDay }) => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/light-v11',
-      center: [18.8601, -33.9321], // Centered on Stellenbosch
-      zoom: 7.5,
+      center: [24.5, -29], // Center on South Africa
+      zoom: 5,
     });
     
     // Add navigation controls

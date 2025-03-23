@@ -39,8 +39,16 @@ const LogisticsDashboard: React.FC = () => {
           variant={selectedDay === "All" ? "default" : "outline"}
           className="flex flex-col items-center justify-center h-auto py-3"
           onClick={() => setSelectedDay("All")}
+          style={{ 
+            backgroundColor: selectedDay === "All" ? dayColors.All : 'transparent',
+            color: selectedDay === "All" ? 'white' : 'inherit',
+            borderColor: dayColors.All
+          }}
         >
-          <span>All Days</span>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dayColors.All }}></div>
+            <span>All Days</span>
+          </div>
           <span className="text-xs mt-1">{formatCount("All")} locations</span>
         </Button>
         
@@ -53,16 +61,41 @@ const LogisticsDashboard: React.FC = () => {
             style={{ 
               backgroundColor: selectedDay === day ? color : 'transparent',
               color: selectedDay === day ? 'white' : 'inherit',
-              borderColor: selectedDay === day ? color : undefined
+              borderColor: color
             }}
           >
-            <span>{day}</span>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
+              <span>{day}</span>
+            </div>
             <span className="text-xs mt-1">{formatCount(day)} locations</span>
           </Button>
         ))}
       </div>
       
       <LogisticsMap selectedDay={selectedDay} />
+      
+      {/* Map Legend Card */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Map Legend</CardTitle>
+          <CardDescription>Color-coded locations by day of week</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: dayColors.All }}></div>
+              <span>Multiple Days</span>
+            </div>
+            {Object.entries(dayColors).filter(([day]) => day !== "All").map(([day, color]) => (
+              <div key={day} className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color }}></div>
+                <span>{day}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
       
       <Card className="mb-6">
         <CardHeader>
