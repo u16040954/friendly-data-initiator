@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { MapPin } from 'lucide-react';
 
 // You can add your Mapbox token here for sharing:
-const PRECONFIGURED_MAPBOX_TOKEN = ""; // Add your token here to share it with all users
+const PRECONFIGURED_MAPBOX_TOKEN = "pk.eyJ1IjoiZmFpcndheWZvcnR1bmVzIiwiYSI6ImNtOGxpbDU5eTB5dzYyaXNlNzdkdmlrc28ifQ.BBoEbEv2-l2w0KDP7KdKow"; // Add your token here to share it with all users
 
 const LogisticsDashboard: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<string>("All");
