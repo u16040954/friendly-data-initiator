@@ -7,6 +7,9 @@ import { dayColors, dailyLocations } from '@/data/locationData';
 import { Separator } from '@/components/ui/separator';
 import { MapPin } from 'lucide-react';
 
+// You can add your Mapbox token here for sharing:
+const PRECONFIGURED_MAPBOX_TOKEN = ""; // Add your token here to share it with all users
+
 const LogisticsDashboard: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<string>("All");
   
@@ -73,7 +76,7 @@ const LogisticsDashboard: React.FC = () => {
         ))}
       </div>
       
-      <LogisticsMap selectedDay={selectedDay} />
+      <LogisticsMap selectedDay={selectedDay} preConfiguredToken={PRECONFIGURED_MAPBOX_TOKEN} />
       
       {/* Map Legend Card */}
       <Card className="mb-6">

@@ -4,16 +4,33 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Location, getLocationsByDay, dayColors } from '@/data/locationData';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 
 interface LogisticsMapProps {
   selectedDay: string;
+  preConfiguredToken?: string;
 }
 
-const LogisticsMap: React.FC<LogisticsMapProps> = ({ selectedDay }) => {
+const MAPBOX_TOKEN_KEY = 'logistics-mapbox-token';
+
+const LogisticsMap: React.FC<LogisticsMapProps> = ({ selectedDay, preConfiguredToken }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const [showTokenInput, setShowTokenInput] = useState<boolean>(true);
+  
+  // Try to load token from localStorage on component mount
+  useEffect(() => {
+    const savedToken = localStorage.getItem(MAPBOX_TOKEN_KEY);
+    if (savedToken) {
+      setMapboxToken(savedToken);
+      setShowTokenInput(false);
+    } else if (preConfiguredToken) {
+      setMapboxToken(preConfiguredToken);
+      setShowTokenInput(false);
+    }
+  }, [preConfiguredToken]);
   
   const addMarkers = (locations: Location[]) => {
     if (!map.current) return;
@@ -57,26 +74,39 @@ const LogisticsMap: React.FC<LogisticsMapProps> = ({ selectedDay }) => {
   const initializeMap = () => {
     if (!mapContainer.current || !mapboxToken) return;
     
-    // Initialize map
-    mapboxgl.accessToken = mapboxToken;
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
-      center: [24.5, -29], // Center on South Africa
-      zoom: 5,
-    });
-    
-    // Add navigation controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl(),
-      'top-right'
-    );
-    
-    map.current.on('load', () => {
-      const locations = getLocationsByDay(selectedDay);
-      addMarkers(locations);
-    });
+    try {
+      // Initialize map
+      mapboxgl.accessToken = mapboxToken;
+      
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [24.5, -29], // Center on South Africa
+        zoom: 5,
+      });
+      
+      // Add navigation controls
+      map.current.addControl(
+        new mapboxgl.NavigationControl(),
+        'top-right'
+      );
+      
+      map.current.on('load', () => {
+        const locations = getLocationsByDay(selectedDay);
+        addMarkers(locations);
+      });
+      
+      // Save token to localStorage for future visits
+      localStorage.setItem(MAPBOX_TOKEN_KEY, mapboxToken);
+    } catch (error) {
+      console.error('Map initialization error:', error);
+      toast({
+        title: "Map error",
+        description: "There was an error initializing the map. Please check your Mapbox token.",
+        variant: "destructive"
+      });
+      setShowTokenInput(true);
+    }
   };
   
   useEffect(() => {
@@ -96,6 +126,20 @@ const LogisticsMap: React.FC<LogisticsMapProps> = ({ selectedDay }) => {
     e.preventDefault();
     setShowTokenInput(false);
     initializeMap();
+  };
+  
+  const handleChangeToken = () => {
+    // Clear the current map
+    if (map.current) {
+      map.current.remove();
+      map.current = null;
+    }
+    
+    // Clear localStorage
+    localStorage.removeItem(MAPBOX_TOKEN_KEY);
+    
+    // Show token input again
+    setShowTokenInput(true);
   };
 
   return (
@@ -129,6 +173,18 @@ const LogisticsMap: React.FC<LogisticsMapProps> = ({ selectedDay }) => {
           </div>
         ) : null}
         <div ref={mapContainer} className="w-full h-full rounded-lg" />
+        
+        {/* Settings button to change token */}
+        {!showTokenInput && mapboxToken && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="absolute top-2 right-2 z-10 bg-background/80"
+            onClick={handleChangeToken}
+          >
+            Change Map Token
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
